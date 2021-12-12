@@ -82,7 +82,7 @@ public class BouncingRectangle implements GameObject {
 
 		
 		
-			System.out.println("x: " + x + "     y: " + y);
+			//System.out.println("x: " + x + "     y: " + y);
 		
 	}
 	public void renderGraphics(Graphics g) {
