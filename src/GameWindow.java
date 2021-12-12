@@ -11,26 +11,24 @@ import javax.swing.JFrame;
 
 public class GameWindow extends Canvas implements GameObject{
 
+	
+	final boolean DEBUG = false;
+	//final boolean DEBUG = true;
+	
+	final int UPS = 60;
+	
+	
 	private static final long serialVersionUID = 3400434845763850354L;
 	
 	private JFrame window;
 	private boolean gameIsRunning = true;
 	
-	Vector<Color> colors =new Vector<Color>() ;
-	
-	private Color randomColor;
-	
-	private int xDirection = 1;
-	private int yDirection = 1;
-	
+
 	private long framesRendered = 0;
 	private long logicTicks = 0;
 	
-	private Point p;
-	private double x = 100.0;
-	private double y = 100.0;
-	
-	Rectangle r;
+	BouncingRectangle r;
+	BouncingRectangle rr;
 	
 	private Graphics g;
 	
@@ -38,14 +36,53 @@ public class GameWindow extends Canvas implements GameObject{
 	
 		initializeWindow();
 		
-		r = new Rectangle(10,10,50,50);
+		r = new BouncingRectangle(100,100,50,50,this);
+		rr = new BouncingRectangle(10,80,50,50,this);
+		
+
+		
+		
+		long currentTime = System.nanoTime();
+		long loopDuration = 0;
+		long lastTime = 0;
+		
+		long actualTimeDuration = 0;
 		
 		
 		while(gameIsRunning) {
+		
+			loopDuration = System.nanoTime()-lastTime;
 			
-			updateLogic();
+			lastTime =System.nanoTime();
+			
+			actualTimeDuration = actualTimeDuration + loopDuration;
+			
+			if(actualTimeDuration>1000000/UPS) {
+				//System.out.println("super");
+				actualTimeDuration = 0;
+				
+				
+				updateLogic(loopDuration);
+				
+			}
+				
+			
+			//currentTime = System.nanoTime();
+			
+			
+			//System.out.println(loopDuration/1000);
+			
+			
+			
+			
+			//update logic with 60 fps!!
+			
+			
 			
 		
+			
+			
+			//render graphics as fast as can
 			renderGraphics(g);
 		}
 		
@@ -69,65 +106,22 @@ public class GameWindow extends Canvas implements GameObject{
 		
 	}
 	
-	public void updateLogic() {
-		
-		
-		
-				
-		
-		colors.add(Color.red);
-		colors.add(Color.green);
-		colors.add(Color.yellow);
-		colors.add(Color.cyan);
-		colors.add(Color.white);
-		colors.add(Color.BLUE);
-		colors.add(Color.PINK);
-		
-		
-		Random r = new Random();
-		
-		
-		
-		//TODO make function to generate random colo
-		//     setRandomColor();
-		//     with rgb;
-		
-		
-		
-		
-		if(x > this.getWidth()-100) {
-			xDirection = -1;
-			randomColor = colors.get(r.nextInt(colors.size()));
+	public void updateLogic(long dT) {
+
+		/**
+		for(long i = 0; i<1000000000000000L;i++)
+		{
+			;
 		}
-		
-		if(x<0) {
-			randomColor = colors.get(r.nextInt(colors.size()));
-			xDirection = 1;
-		}
-		
-		if(y > this.getHeight()-100) {
-			randomColor = colors.get(r.nextInt(colors.size()));
-			yDirection = -1;
-		}
-		
-		if(y<0) {
-			randomColor = colors.get(r.nextInt(colors.size()));
-			yDirection = 1;
-		}
-		
-		
-		
-		x = x+(xDirection*0.4);
-		y= y+(yDirection* 0.5);
-		
-		
-		
-		
-		
+		**/
 		
 		logicTicks++;
-		System.out.println("Tick Nr.: " + logicTicks);
+		if(DEBUG)
+			System.out.println("Tick Nr.: " + logicTicks);
 		
+		
+		r.updateLogic(dT);
+		rr.updateLogic(dT);
 		
 		
 		
@@ -149,11 +143,12 @@ public class GameWindow extends Canvas implements GameObject{
 		g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		
 		//============ drawing stuff   ============
-		g.setColor(randomColor);
-		g.fillRect((int)x,(int)y, 100, 100);
+		
+		
 		
 		
 		r.renderGraphics(g);
+		rr.renderGraphics(g);
 		
 		
 		//============================================
@@ -163,7 +158,8 @@ public class GameWindow extends Canvas implements GameObject{
 		g.dispose();
 		
 		framesRendered++;
-		System.out.println("Frame Nr.: " + framesRendered);
+		if(DEBUG)
+			System.out.println("Frame Nr.: " + framesRendered);
 		
 	}
 	
