@@ -11,26 +11,24 @@ import javax.swing.JFrame;
 
 public class GameWindow extends Canvas implements GameObject{
 
-	
-	final boolean DEBUG = false;
-	//final boolean DEBUG = true;
-	
-	final int UPS = 60;
-	
-	
 	private static final long serialVersionUID = 3400434845763850354L;
 	
-	private JFrame window;
-	private boolean gameIsRunning = true;
+	final int UPS = 60;
+	int frames = 0;
+	int ticks = 0;
+	
+	JFrame window;
+	boolean gameIsRunning = true;
 	
 
-	private long framesRendered = 0;
-	private long logicTicks = 0;
-	
 	BouncingRectangle r;
 	BouncingRectangle rr;
 	
-	private Graphics g;
+	private Graphics graphics;
+
+	
+	private int actualFrames;
+	private int actualTicks;
 	
 	public GameWindow(){
 	
@@ -40,50 +38,58 @@ public class GameWindow extends Canvas implements GameObject{
 		rr = new BouncingRectangle(10,80,50,50,this);
 		
 
-		
-		
-		long currentTime = System.nanoTime();
-		long loopDuration = 0;
-		long lastTime = 0;
-		
-		long actualTimeDuration = 0;
-		
-		
-		while(gameIsRunning) {
-		
-			loopDuration = System.nanoTime()-lastTime;
+		while(true) {
+			//Game Loop
 			
-			lastTime =System.nanoTime();
+
+			long startTime = System.nanoTime();
+			long deltaTime = 0;
+			long frameCounterTime;
+			long renderCounterTime;
+			double timePerFrame = 1000000000.0 / UPS;
+
 			
-			actualTimeDuration = actualTimeDuration + loopDuration;
 			
-			if(actualTimeDuration>1000000/UPS) {
-				//System.out.println("super");
-				actualTimeDuration = 0;
+			frameCounterTime = System.currentTimeMillis();
+			renderCounterTime = System.currentTimeMillis();
+
+			while (gameIsRunning) {
+				deltaTime = System.nanoTime() - startTime;
+
+				if (deltaTime >= timePerFrame) {
+
+					//update Methode
+					updateLogic(deltaTime);
+
+					frames++;
+					deltaTime = 0;
+					startTime = System.nanoTime();
+				}
+
+				//Rendermethode
+				renderGraphics(graphics);
+				ticks++;
+
+				//RenderCounter
+				if(System.currentTimeMillis() - renderCounterTime>=1000)
+				{
+					//System.out.println(actualTicks);
+					actualTicks = ticks;
+					ticks = 0;
+					renderCounterTime = System.currentTimeMillis();
+				}
 				
 				
-				updateLogic(loopDuration);
 				
+				
+				//Frame Counter
+				if (System.currentTimeMillis() - frameCounterTime >= 1000) {
+				//System.out.println(frames);
+					actualFrames = frames;
+					frames = 0;
+					frameCounterTime = System.currentTimeMillis();
+				}
 			}
-				
-			
-			//currentTime = System.nanoTime();
-			
-			
-			//System.out.println(loopDuration/1000);
-			
-			
-			
-			
-			//update logic with 60 fps!!
-			
-			
-			
-		
-			
-			
-			//render graphics as fast as can
-			renderGraphics(g);
 		}
 		
 	}
@@ -94,36 +100,28 @@ public class GameWindow extends Canvas implements GameObject{
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		
-		
-		
 		window.setLocationRelativeTo(null);
 		
 		window.add(this);
 		window.setVisible(true);
-		
-		
-		
-		
+
 	}
 	
 	public void updateLogic(long dT) {
 
-		/**
-		for(long i = 0; i<1000000000000000L;i++)
+		window.setTitle("Game =======     FPS: " + actualFrames + "    UPS: " + actualTicks);
+		for(long i = 0; i<10000L;i++)
 		{
 			;
 		}
-		**/
+	
 		
-		logicTicks++;
-		if(DEBUG)
-			System.out.println("Tick Nr.: " + logicTicks);
+	
 		
+		//System.out.println("Tick Nr.: " + logicTicks);
 		
 		r.updateLogic(dT);
 		rr.updateLogic(dT);
-		
-		
 		
 	}
 
@@ -157,9 +155,9 @@ public class GameWindow extends Canvas implements GameObject{
 		bs.show();
 		g.dispose();
 		
-		framesRendered++;
-		if(DEBUG)
-			System.out.println("Frame Nr.: " + framesRendered);
+		
+		
+		
 		
 	}
 	

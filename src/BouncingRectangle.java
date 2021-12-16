@@ -3,13 +3,8 @@ import java.awt.Graphics;
 import java.util.Random;
 import java.util.Vector;
 
-public class BouncingRectangle implements GameObject {
+public class BouncingRectangle extends Entity implements GameObject {
 
-	
-	
-	private double x;
-	private double y;
-	
 	private int width;
 	private int height;
 	
@@ -28,10 +23,11 @@ public class BouncingRectangle implements GameObject {
 	
 	public BouncingRectangle(double x, double y, int width, int height, GameWindow window)
 	{
-		this.x = x;
-		this.y = y;
+		this.xPosition = x;
+		this.yPosition = y;
 		this.width = width;
 		this.height = height;
+			
 		
 		windowHeight = window.getHeight();
 		windowWidth = window.getWidth();
@@ -55,30 +51,30 @@ public class BouncingRectangle implements GameObject {
 		//     with rgb;
 		
 	
-		if(x > windowWidth-width) {
+		if(xPosition > windowWidth-width) {
 			xDirection = -1;
 			randomColor = colors.get(r.nextInt(colors.size()));
 		}
 		
-		if(x<0) {
+		if(xPosition<0) {
 			randomColor = colors.get(r.nextInt(colors.size()));
 			xDirection = 1;
 		}
 		
-		if(y > windowHeight-height) {
+		if(yPosition > windowHeight-height) {
 			randomColor = colors.get(r.nextInt(colors.size()));
 			yDirection = -1;
 		}
 		
-		if(y<0) {
+		if(yPosition<0) {
 			randomColor = colors.get(r.nextInt(colors.size()));
 			yDirection = 1;
 		}
 		
 		
-		x=x+(xDirection*0.4);
+		xPosition=xPosition+(xDirection*0.4);
 		
-		y= y+(yDirection* 0.4);
+		yPosition= yPosition+(yDirection* 0.4);
 
 		
 		
@@ -92,9 +88,15 @@ public class BouncingRectangle implements GameObject {
 	
 		
 		//g.setColor(Color.blue);
-		g.fillRect((int)x, (int)y, width, height);
+		g.fillRect((int)xPosition, (int)yPosition, width, height);
 		
 		g.setColor(colorBefor);
+	}
+
+	@Override
+	public void printToConsole() {
+		System.out.println("bouncing rectangle");
+		
 	}
 
 }
